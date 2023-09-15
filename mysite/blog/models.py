@@ -4,8 +4,22 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+# CUSTOME MODEL MANAGER
+class PublishManager(models.Manager):
+    """ 
+        Define a custome manager that
+        retrieves objs with status set to published
+    """
+    def get_queryset(self):
+        return super().get_queryset()\
+                      .filter(status=Post.Status.PUBLISHED)
+
+
 class Post(models.Model):
     """ Post model map to table in a db """
+    
+    objects = models.Manager()
+    published = PublishManager()
 
     class Status(models.TextChoices):
         """ Use to define the status or state of a blog post """
@@ -16,7 +30,7 @@ class Post(models.Model):
     title = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250)
     body = models.TextField()
-    published = models.DateTimeField(default=timezone.now)
+    publish = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=100, choices=Status.choices, default=Status.DRAFT)
@@ -24,9 +38,9 @@ class Post(models.Model):
 
     # DEFINE METADATA FOR OUR MODEL
     class Metal:
-        ordering = ["-published"]
+        ordering = ["-publish"]
         indexes = [
-            models.Index(fields=["-pubblished"])
+            models.Index(fields=["-publish"])
         ]
     def __str__(self):
         return self.title
