@@ -4,6 +4,16 @@
  <h1>{{ post.title }}</h1>
  <pclass="date">
  Published {{ post.publish }} by {{ post.author }}
+ <ul>
+    <li>{{ post.publish.year }}</li>
+    <li>{{ post.publish.month }}</li>
+    <li>{{ post.publish.day }}</li>
+ </ul>
  </p>
  {{ post.body|linebreaks }}
+ <p>
+   <a href="{% url 'blog:post_share' post.id %}">
+      Share Post
+   </a>
+ </p>
 {% endblock %}
