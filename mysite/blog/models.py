@@ -54,5 +54,23 @@ class Post(models.Model):
                            self.publish.day,
                            self.slug
                         ])
-        
+
+# COMMENT MODEL
+class Comment(models.Model):
+    """ Defines comment table structure """
+    post = models.ForeignKey(Post, on_delete=models.CASCADE,related_name="comments")
+    name = models.CharField(max_length=100)
+    email = models.EmailField(max_length=100)
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
     
+    # META PROPS
+    class Meta:
+        """ Adds meta props to model """
+        ordering = ["created_at"]
+        indexes = [models.Index(fields=["created_at"])]
+    def __str__(self):
+        """ Handle string reprs of object """
+        return f"Commented by {self.name} on {self.post}"
