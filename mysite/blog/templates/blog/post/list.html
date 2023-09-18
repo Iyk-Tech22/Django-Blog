@@ -8,6 +8,13 @@
                 {{ post.title }}
             </a>
         </h2>
+        {% if tag %}
+
+        {% else if }
+            <h3 class="tags">
+                Tags: {{ post.tags.all|join:", " }}
+            </h3>
+        {% endif %}
         <p class="date">
             Published {{ post.publish }} by {{ post.author }}
         </p>

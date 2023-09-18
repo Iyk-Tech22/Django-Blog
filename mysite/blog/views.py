@@ -7,12 +7,17 @@ from django.views.generic import ListView
 from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
-
+from taggit.models import Tag
 
 # FUNCTIONAL BASE VIEWS HERE
-def post_list(request):
+def post_list(request, slug_tag=None):
     """ Display all posts """
+    
     post_list = Post.published.all()
+    tag = None
+    if slug_tag:
+        tag = get_object_or_404(Tag, slug=slug_tag)
+        post_list = post_list.filter(tags__in=[tag])
     # Pagination
     paginator = Paginator(post_list, 3)
     page_number = request.GET.get("page", 1)
@@ -23,7 +28,8 @@ def post_list(request):
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
     context = {
-        "posts":posts
+        "posts":posts,
+        "tag":tag,
     }
     return render(request, "blog/post/list.html", context)
     
@@ -80,7 +86,7 @@ def post_share(request, post_id):
 @require_POST
 def post_comment(request, post_id):
     """ Handle comment submmisions """
-    post = get_object_or_404(Post, id=post_id, status=Post.Status.PUBLISH)
+    post = get_object_or_404(Post, id=post_id, status=Post.Status.PUBLISHED)
     comment = None
     form = CommentForm(data=request.POST)
     if form.is_valid():

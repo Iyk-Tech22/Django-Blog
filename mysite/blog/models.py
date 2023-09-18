@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
-
+from taggit.managers import TaggableManager
 # Create your models here.
 
 # CUSTOME MODEL MANAGER
@@ -21,6 +21,7 @@ class Post(models.Model):
     
     objects = models.Manager()
     published = PublishManager()
+    tags = TaggableManager()
 
     class Status(models.TextChoices):
         """ Use to define the status or state of a blog post """

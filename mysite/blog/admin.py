@@ -16,6 +16,6 @@ class PostAdmin(admin.ModelAdmin):
 # ADD COMMENT MODEL TO DJANGO ADMIN
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ["name", "email", "post", "active"]
-    list_filter = ["created_at", "updated_at", "email", "active"]
+    list_display = ["name", "email", "post", "created_at", "active"]
+    list_filter =  ["created_at", "updated_at", "email", "active"]
     search_fields = ["name", "email", "body"]
