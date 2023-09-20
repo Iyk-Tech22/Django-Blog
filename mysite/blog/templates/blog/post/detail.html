@@ -1,4 +1,6 @@
 {% extends "blog/base.html" %}
+{% load blog_tags %}
+
 {% block title %}{{ post.title }}{% endblock %}
 {% block content %}
    <h1>{{ post.title }}</h1>
@@ -10,12 +12,24 @@
       <li>{{ post.publish.day }}</li>
    </ul>
    </p>
-   {{ post.body|linebreaks }}
+   {{ post.body|markdown|linebreaks }}
    <p>
       <a href="{% url 'blog:post_share' post.id %}">
          Share Post
       </a>
    </p>
+   <h2> Similar posts </h2>
+   {% for post in similar_posts %}
+       <p class="similar_post">
+           <a href="{{ post.get_absolute_url }}">
+               {{ post.title }}
+           </a>
+       </p>
+   {% empty %}
+       <p>
+           No similar posts
+       </p>
+   {% endfor %}
    {% with comments.count as total_comment %}
       <h2>
          {{ total_comment }} comment {{ total_comments|pluralize }}

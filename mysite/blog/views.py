@@ -8,15 +8,16 @@ from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
 from taggit.models import Tag
+from django.db.models import Count
 
 # FUNCTIONAL BASE VIEWS HERE
-def post_list(request, slug_tag=None):
+def post_list(request, tag_slug=None):
     """ Display all posts """
     
     post_list = Post.published.all()
     tag = None
-    if slug_tag:
-        tag = get_object_or_404(Tag, slug=slug_tag)
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
         post_list = post_list.filter(tags__in=[tag])
     # Pagination
     paginator = Paginator(post_list, 3)
@@ -56,8 +57,13 @@ def post_detail(request, year, month, day, slug):
         slug=slug
     )
     comments = post.comments.filter(active=True)
+    post_tags_id = post.tags.values_list("id", flat=True)
+    similar_posts = Post.published.filter(tags__in=post_tags_id)\
+                                       .exclude(id=post.id)
+    similar_posts = similar_posts.annotate(same_tag=Count("tags"))\
+                                         .order_by("-same_tag", "-publish")[:4]
     form = CommentForm()
-    context = {"post":post, "comments":comments, "form":form}
+    context = {"post":post, "comments":comments, "form":form, "similar_posts":similar_posts}
     return render(request, "blog/post/detail.html", context)
 
 def post_share(request, post_id):
