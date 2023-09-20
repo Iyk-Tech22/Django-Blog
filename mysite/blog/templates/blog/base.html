@@ -12,6 +12,11 @@
            {% endblock %}
        </div>
        <div id="sidebar">
+            <p>
+                <a href="{% url 'blog:post_feed' %}">
+                    Subscribe to my RSS feed
+                </a>
+            </p>
            <h2> Latest Post </h2>
            {% latest_posts 4 %}
            <h2> Most Commented Post </h2>
