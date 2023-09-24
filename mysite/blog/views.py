@@ -4,11 +4,12 @@ from .models import Post, Comment
 from django.template import loader
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
-from .forms import EmailPostForm, CommentForm
+from .forms import EmailPostForm, CommentForm, SearchForm
 from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
 from taggit.models import Tag
 from django.db.models import Count
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
 
 # FUNCTIONAL BASE VIEWS HERE
 def post_list(request, tag_slug=None):
@@ -106,7 +107,27 @@ def post_comment(request, post_id):
     }
     return render(request, "blog/post/comment.html", context)
     
-
+# SEARCH FEATURE
+def search_post(request):
+    """ Handle search for post """
+    query = None
+    results = []
+    form = SearchForm(request.GET)
+    if "query" in request.GET:
+        if form.is_valid():
+            query = form.cleaned_data["query"]
+            search_query = SearchQuery(query)
+            search_vector = SearchVector("title", weight="A") + SearchVector("body", weight="B")
+            results = Post.published.annotate(
+                similarity=TrigramSimilarity("title", query),
+            ).filter(similarity__gt=0.1).order_by("-similarity")
+        
+    context = {
+        "form":form,
+        "query":query,
+        "results":results
+    }
+    return render(request, "blog/post/search.html", context)
 #----------------------------------------------------------------#
 
 # CLASS BASE VIEWS HERE

@@ -18,3 +18,8 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ["name", "email", "body"]
+
+# SEARCH FORM
+class SearchForm(forms.Form):
+    """ provide post searching capabilities """
+    query = forms.CharField(max_length=100)
